@@ -37,21 +37,35 @@ use Session;
 
 class AdminController extends Controller
 {
+    public function __construct()
+    {
+        session_start();
+
+    }
 
     public function adminloginpage()
     {
+        if(isset($_SESSION['admin']))
+        {
+        $this->dashboard();
+        }
         return view('admins.login');
     }
 
     function admin_login_submit(Request $req)
     {   
         $user = Admin::where(['email'=>$req->email])->first();
+        
         $data = Admin::all();
         if ($user) {
+            Session::flush();
+            
 
             if (Hash::check($req->password, $user->password)) {
-                $req->session()->flash('invalid','Success');
-                $req->session()->put('admin',$user); 
+                
+                // $req->session()->flash('invalid','Success');
+                Session::put('admin',$user);
+                $_SESSION['admin'] = $user;
                 return redirect('admin/dashboard');
 
             }else{
@@ -99,17 +113,19 @@ class AdminController extends Controller
 
     function logout(Request $req)
     {
-        if ($req->session()->has('admin')) {
-            $req->session()->pull('admin');          
-            return redirect('admin/login'); 
-        }
+        session_destroy();
+        return redirect('admin/login'); 
     }
 
     public function dashboard(){
+        
         $categories=Category::all();
         $products=Product::all();
         $rating=Rating::all();
-        return view('admins.dashboard',compact('categories','products','rating'));
+        $urreviews = $r = DB::table('rating')->where('is_read',0)->get();
+        $corders = Order::where('dstatus',2)->get();
+        $unrorders = Order::where('is_read',0)->get();
+        return view('admins.dashboard',compact('categories','products','rating','corders','unrorders','urreviews'));
     }
     
     public function category(Request $request,$id=0,$delete=null){
@@ -137,25 +153,25 @@ class AdminController extends Controller
                 $category->name=$request->name;
                 $category->status=$request->status;
                 $category->slug= strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->name)));
-                // if(isset($request->image_one)){
-                //     $imageone = $request->image_one;
-                //     $pimage_name = time().$imageone->getClientOriginalName();
-                //     $imageone->move(public_path('/images/category/'),$pimage_name);
-                //     $category->image= 'public/images/category/'.$pimage_name;
-                // }
+                /*if(isset($request->image_one)){
+                    $imageone = $request->image_one;
+                    $pimage_name = time().$imageone->getClientOriginalName();
+                    $imageone->move(public_path('/images/category/'),$pimage_name);
+                    $category->image= 'public/images/category/'.$pimage_name;
+                }*/
                 
-                // if ($request->hasFile('image_one')) {
-                //     $file = $request->file('image_one');
-                //     $extension = $file->getClientOriginalExtension();
-                //     $extension = 'webp';
-                //     // Rename the file with a new extension
-                //     $name = time() . '.' . $extension;
+                if ($request->hasFile('image_one')) {
+                    $file = $request->file('image_one');
+                    $extension = $file->getClientOriginalExtension();
+                    $extension = 'webp';
+                    // Rename the file with a new extension
+                    $name = time() . '.' . $extension;
                 
-                //     // Move the uploaded file to the desired directory
-                //     $file->move(public_path('/images/category/'), $name);
+                    // Move the uploaded file to the desired directory
+                    $file->move(public_path('/images/category/'), $name);
                 
-                //     $category['image'] = 'public/images/category/'.$name;
-                // }
+                    $category['image'] = 'public/images/category/'.$name;
+                }
                 
                 $category->updated_at=Date('Y-m-d h:i:s');
                 $category->save();
@@ -564,6 +580,7 @@ class AdminController extends Controller
     
     public function review(Request $request,$id=0,$delete=null){
         $reviews=Rating::all();
+        $r = DB::table('rating')->update(array('is_read'=>1));
         return view('admins.review',compact('reviews'));
     }
     
@@ -622,6 +639,19 @@ class AdminController extends Controller
                 //     $imageone->move(public_path('/images/'),$pimage_name);
                 //     $setting->logo = 'public/images/'.$pimage_name;
                 // }
+                
+               if ($request->hasFile('wlogo')) {
+                    $file = $request->file('wlogo');
+                    $extension = $file->getClientOriginalExtension();
+                    $extension = 'webp';
+                    // Rename the file with a new extension
+                    $name = time() . '.' . $extension;
+                
+                    // Move the uploaded file to the desired directory
+                    $file->move(public_path('/images/'), $name);
+                
+                    $setting['wlogo'] = 'public/images/'.$name;
+                }
                 
                if ($request->hasFile('logo')) {
                     $file = $request->file('logo');
@@ -716,6 +746,33 @@ class AdminController extends Controller
                     $setting['homepage_image_4'] = 'public/images/'.$name;
                 }
                 
+                if ($request->hasFile('homepage_image_5')) {
+                    $file = $request->file('homepage_image_5');
+                    $extension = $file->getClientOriginalExtension();
+                    $extension = 'webp';
+                    // Rename the file with a new extension
+                    $name = time() . '.' . $extension;
+                
+                    // Move the uploaded file to the desired directory
+                    $file->move(public_path('/images/'), $name);
+                
+                    $setting['homepage_image_5'] = 'public/images/'.$name;
+                }
+                
+                if ($request->hasFile('homepage_image_6')) {
+                    $file = $request->file('homepage_image_6');
+                    $extension = $file->getClientOriginalExtension();
+                    $extension = 'webp';
+                    // Rename the file with a new extension
+                    $name = time() . '.' . $extension;
+                
+                    // Move the uploaded file to the desired directory
+                    $file->move(public_path('/images/'), $name);
+                
+                    $setting['homepage_image_6'] = 'public/images/'.$name;
+                }
+                
+                
                
                 $setting->email=$request->email;
                 $setting->phone=$request->phone;
@@ -723,14 +780,22 @@ class AdminController extends Controller
                 $setting->title=$request->title;
                 $setting->description=$request->description;
                 $setting->keywords=$request->keywords;
-                
+                 
                 
                
                 $setting->phonetwo=$request->phonetwo;
                 $setting->instagram=$request->instagram;
                 
                 $setting->homepage_footer=$request->homepage_footer;
+                $setting->homepage_img1d=$request->homepage_img1d;
+                $setting->homepage_img2d=$request->homepage_img2d;
+                $setting->homepage_img3d=$request->homepage_img3d;
+                $setting->homepage_img4d=$request->homepage_img4d;
+                $setting->homepage_img5d=$request->homepage_img5d;
+                $setting->homepage_img6d=$request->homepage_img6d;
+                $setting->shipping_charges=$request->shipping_charges;
                $setting->footer_text=$request->footer;
+               $setting->news_text=$request->news_text;
                 $setting->save();
             }
         }
@@ -787,8 +852,11 @@ class AdminController extends Controller
     }
     
     public function orders(Request $request){
+        
         $orders=Order::where('status','1')->orderBy('id','DESC')->get();
+        $r = DB::table('orders')->update(array('is_read'=>1));
         return view('admins.orders',compact('orders'));
+        
     }
     public function delete_order(Request $request){
         $ids = $request->input('id', []);
@@ -842,11 +910,7 @@ class AdminController extends Controller
             
             if($request->category_id !== null){
                 
-                if(count($request->category_id) > 1){
-                    $cats = implode(",",$request->category_id);   
-                }else{
-                    $cats = implode(",",$request->category_id);
-                }
+                $cats = $request->category_id;
                 
             }else{
                 $cats = '';
@@ -886,6 +950,7 @@ class AdminController extends Controller
                 $product->tags=$tags;
                 $product->shipping_price=$request->shipping_price;
                 $product->slug=$request->slug;
+                $product->subcategory_id=$request->subcategory_id;
                 if(isset($home_cats))
                 $product->home_cats=$home_cats;
                 else
@@ -972,11 +1037,7 @@ class AdminController extends Controller
                 }
                 if($request->category_id !== null){
                 
-                if(count($request->category_id) > 1){
-                    $cats = implode(",",$request->category_id);   
-                }else{
-                    $cats = implode(",",$request->category_id);
-                }
+                $cats = $request->category_id;
                 
             }else{
                 $cats = '';
@@ -992,6 +1053,7 @@ class AdminController extends Controller
                 $product->tags=$tags;
                 $product->shipping_price=$request->shipping_price;
                 $product->slug=$request->slug;
+                $product->subcategory_id=$request->subcategory_id;
                 if(isset($home_cats))
                 $product->home_cats=$home_cats;
                 else
@@ -1054,6 +1116,7 @@ class AdminController extends Controller
             ]);
         }
         $categories=Category::all();
+        $scategories=SubCategory::all();
         
         $colors = Colors::all();
         $size = Size::all();
@@ -1068,7 +1131,7 @@ class AdminController extends Controller
         
         
         
-        return view('admins.product_form',compact('categories','edit','seo','colors','size','calarity','shap','home_cats'));
+        return view('admins.product_form',compact('categories','scategories','edit','seo','colors','size','calarity','shap','home_cats'));
     }
     private function convertToWebp($sourcePath)
     {
@@ -1118,6 +1181,7 @@ class AdminController extends Controller
                         'position' => $request->position,
                         'status' => $request->status,
                         'menu' => $request->menu,
+                        'content'=>utf8_encode($request->content),
                         'menu_type' => $request->menu_type,
                         );
                         $id = DB::table('sections')->where('id', $request->hidden_id)->update($in);
@@ -1135,7 +1199,7 @@ class AdminController extends Controller
                     $page->name=$request->name;
                     $page->menu_type=$request->menu_type;
                     $page->slug=$request->slug;
-                    $page->content=$request->content;
+                    $page->content=utf8_encode($request->content);
                     $page->status=$request->status;
                     $page->position=$request->position;
                     $page->section=$request->sections;
@@ -1312,6 +1376,7 @@ class AdminController extends Controller
             'msg_type'=>'success',
         ]);
     }
+    
     public function order_edit($id)
     {
         $edit=Order::findorFail($id);
@@ -1319,6 +1384,60 @@ class AdminController extends Controller
         
         
         return view('admins.edit_order',compact('edit'));
+    }
+    private function send_grid($to,$subj, $html,$from = 'info@live-x-martplace.com')
+    {
+        $param =array (
+  'personalizations' => 
+  array (
+    0 => 
+    array (
+      'to' => 
+      array (
+        0 => 
+        array (
+          'email' => $to,
+        ),
+      ),
+    ),
+  ),
+  'from' => 
+  array (
+    'email' => $from,
+  ),
+  'subject' => $subj,
+  'content' => 
+  array (
+    0 => 
+    array (
+      'type' => 'text/html',
+      'value' => $html,
+    ),
+  ),
+);
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+  CURLOPT_URL => 'https://api.sendgrid.com/v3/mail/send',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',
+  CURLOPT_POSTFIELDS =>json_encode($param),
+  CURLOPT_HTTPHEADER => array(
+    'Authorization: Bearer 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',
+    'Content-Type: application/json'
+  ),
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+echo $response;
+
     }
     
     public function up_delivery_status(Request $request)
@@ -1335,17 +1454,13 @@ class AdminController extends Controller
            
            $order_data = Order::where('id',$order->id)->get();
             if($order_data){
-                $to_name = $order->name;
-            $to_email = $order->email;
-            $data = [
+               $data = [
                     'order' =>$order_data ,
                     
                 ];
-            Mail::send('emails.p_order', $data, function($message) use ($to_name, $to_email) {
-            $message->to($to_email, $to_name)
-            ->subject('Proceed Order’');
-            $message->from('order@onlineshoppingstore.pk','onlineshoppingstore.pk');
-            });
+                $to_email = $order->email;
+                $html = view('emails.p_order', $data)->render();
+                $this->send_grid($to_email,'Proceed Order', $html,'orders@live-x-martplace.com');
             }
            return redirect(route('admins.complete_orders'))->with([
             'msg'=>'Order Updated Successfully',
@@ -1368,16 +1483,14 @@ class AdminController extends Controller
                     'order' =>$order_data ,
                     
                 ];
-            Mail::send('emails.d_order', $data, function($message) use ($to_name, $to_email) {
-            $message->to($to_email, $to_name)
-            ->subject('Order Delivery Email’');
-            $message->from('order@onlineshoppingstore.pk','onlineshoppingstore.pk');
-            });
-            }
-           return redirect(route('admins.complete_orders'))->with([
+                $to_email = $order->email;
+                $html = view('emails.d_order', $data)->render();
+                $this->send_grid($to_email,'Order Delivery Email', $html,'orders@live-x-martplace.com');
+                   return redirect(route('admins.orders'))->with([
             'msg'=>'Order Updated Successfully',
             'msg_type'=>'success',
-        ]);
+        ]); 
+            }
         
         }elseif($request->dstatus == 3){
             $order->status = 1;
@@ -1408,11 +1521,9 @@ class AdminController extends Controller
                     'order' =>$order_data ,
                     
                 ];
-            Mail::send('emails.c_order', $data, function($message) use ($to_name, $to_email) {
-            $message->to($to_email, $to_name)
-            ->subject('Dispatch Order');
-            $message->from('order@onlineshoppingstore.pk','onlineshoppingstore.pk');
-            });
+                $html = view('emails.c_order', $data)->render();
+                $this->send_grid($to_email,'Order Delivery Email', $html,'orders@live-x-martplace.com');
+            
             }
            return redirect(route('admins.complete_orders'))->with([
             'msg'=>'Order Updated Successfully',
@@ -1491,51 +1602,20 @@ class AdminController extends Controller
 
             if($request->has('hidden_id')){
                 $category=Media::find($request->hidden_id);
-                
-            //   if(isset($request->name)){
-            //         $imageone = $request->name;
-            //         $pimage_name = time().$imageone->getClientOriginalName();
-            //         $imageone->move(public_path('/images/media/'),$pimage_name);
-            //         $category->name= 'public/images/media/'.$pimage_name;
-            //     }
-                if ($request->hasFile('name')) {
-                    $file = $request->file('name');
-                    $extension = $file->getClientOriginalExtension();
-                    $extension = 'webp';
-                    // Rename the file with a new extension
-                    $name = time() . '.' . $extension;
-                
-                    // Move the uploaded file to the desired directory
-                    $file->move(public_path('/images/media/'), $name);
-                
-                    $category['name'] = 'public/images/media/'.$name;
-                }
+                $category['name'] = $request->name;                
+                $category['icon'] = $request->icon;                
+                $category['link'] = $request->link; 
                 $category->updated_at=Date('Y-m-d h:i:s');
                 $category->save();
                 
                 
             }else{
                 
-                $category=new Media();
-                //  if(isset($request->name)){
-                //     $imageone = $request->name;
-                //     $pimage_name = time().$imageone->getClientOriginalName();
-                //     $imageone->move(public_path('/images/media/'),$pimage_name);
-                //     $category->name= 'public/images/media/'.$pimage_name;
-                // }
-                if ($request->hasFile('name')) {
-                    $file = $request->file('name');
-                    $extension = $file->getClientOriginalExtension();
-                    $extension = 'webp';
-                    // Rename the file with a new extension
-                    $name = time() . '.' . $extension;
-                
-                    // Move the uploaded file to the desired directory
-                    $file->move(public_path('/images/media/'), $name);
-                
-                    $category['name'] = 'public/images/media/'.$name;
-                }
-                $category->updated_at=Date('Y-m-d h:i:s');
+                $category= new Media();
+                $category->name = $request->name;                
+                $category->icon = $request->icon;                
+                $category->link = $request->link;
+                $category->created_at=Date('Y-m-d h:i:s');
                 $category->save();
                 
             }
@@ -1720,9 +1800,11 @@ class AdminController extends Controller
         if ($request->isMethod('post')) {
             if($request->has('hidden_id')){
                 $slider=Slider::find($request->hidden_id);
+                $slider->p = $request->p;
             }else{
                 $slider=new Slider();
                 $slider->created_at=Date('Y-m-d h:i:s');
+                $slider->p = $request->p;
             }
             $slider->updated_at=Date('Y-m-d h:i:s');
             
@@ -1779,36 +1861,37 @@ class AdminController extends Controller
         if(isset($delete) && $id>0){
             $slider=Faq::find($id);
            
-            $slider->delete();
+            $slider->delete(); 
             return redirect(route('admins.faq'))->with([
                 'msg'=>'Faq Deleted Successfully',
                 'msg_type'=>'success',
             ]);
         }
         if($id>0 && !isset($delete)){
-            $edit=Faq::find($id);
-            return view('admins.edit_faq',compact('edit'));
+            $edit=DB::table('faqs')->where('id',$id)->first();
+            return view('admins.faq',compact('edit'));
         }
         if ($request->isMethod('post')) {
+            
+            
             if($request->has('hidden_id')){
-                $slider=Faq::find($request->hidden_id);
+                DB::table('faqs')->where('id',$request->hidden_id)->update([
+            'answer' =>  $request->answer,
+            'question' =>  $request->question,
+        ]);
             }else{
-                $slider=new Faq();
-                
+                $in = DB::table('faqs')->insert([
+            'answer' =>  $request->answer,
+            'question' =>  $request->question,
+        ]);
             }
             
-            $slider->answer = $request->answer;
-            $slider->a_name = $request->a_name;
-            $slider->status = $request->status;
-            $slider->question = $request->question;
-            
-            $slider->save();
             return redirect(route('admins.faq'))->with([
                 'msg'=>'Faq Saved Successfully',
                 'msg_type'=>'success',
             ]);
         }
-        $sliders=Faq::all();
+        $sliders=DB::table('faqs')->get();
         return view('admins.faq',compact('sliders','edit'));
     }
 }

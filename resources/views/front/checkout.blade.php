@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layout.app2')
 <?php
 use App\Models\Catagorie;
 use App\Models\Subcatagorie;
@@ -11,19 +11,6 @@ use App\Models\Admins\Rating;
 use App\Models\Admins\Slider;
   ?>
   @section('content')
-  <div class="banner inner-banner1 ">
-    <div class="container">
-      <section class="banner-detail center-xs">
-        <h1 class="banner-title">Checkout</h1>
-        <div class="bread-crumb right-side float-none-xs">
-          <ul>
-            <li><a href="/">Home</a>/</li>
-            <li><span>Checkout</span></li>
-          </ul>
-        </div>
-      </section>
-    </div>
-  </div>
   
   <section class="checkout-section ptb-95">
     <div class="container">

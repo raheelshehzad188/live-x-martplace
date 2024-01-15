@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layout.app2')
 
 <?php
 use App\Models\Admins\Category;
@@ -7,22 +7,15 @@ use App\Models\Childcatagorie;
 use App\Models\product;
 use App\Models\Admins\Gallerie;
   ?>
+  <?php $setting = DB::table('setting')
+    ->where('id', '=', '1')
+    ->first();
+$cate = DB::table('categories')->get();
+?>
 
 
 @section('content')
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-  <!-- Page Header Start -->
-    <div class="container-fluid bg-secondary mb-5">
-        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
-            <h1 class="font-weight-semi-bold text-uppercase mb-3">Shopping Cart</h1>
-            <div class="d-inline-flex">
-                <p class="m-0"><a href="/">Home</a></p>
-                <p class="m-0 px-2">-</p>
-                <p class="m-0">Shopping Cart</p>
-            </div>
-        </div>
-    </div>
-    <!-- Page Header End -->
 
 @if (Session::has('cart'))
     <!-- Cart Start -->
@@ -40,7 +33,13 @@ use App\Models\Admins\Gallerie;
                         </tr>
                     </thead>
                     <tbody class="align-middle">
+                        @php
+                        $tot = 0;
+                        @endphp
                         @foreach (App\Helpers\Cart::products() as $product)
+                        @php
+                        $tot = $tot+ ($product->discount_price* $product->qty);
+                        @endphp
                         <tr>
                             <td class="align-middle"><img src="/{{$product->image_one}}" alt="" style="width: 50px;"> {{$product->product_name}}</td>
                             <td class="align-middle">Rs {{$product->discount_price}}</td>
@@ -51,7 +50,7 @@ use App\Models\Admins\Gallerie;
                                         <i class="fa fa-minus"></i>
                                         </button>
                                     </div>
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" id="spec{{$product->id}}" id="qty" name="qty" value="{{$product['qty']}}">
+                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" id="qty{{$product->id}}" name="qty" value="{{$product['qty']}}">
                                     <div class="input-group-btn">
                                         <button class="btn btn-sm btn-primary btn-plus plus" type="button" productId="{{$product->id}}" productprice="{{$product->price}}">
                                             <i class="fa fa-plus"></i>
@@ -75,15 +74,15 @@ use App\Models\Admins\Gallerie;
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Sub Total</h5>
-                            <h5 class="font-weight-bold">Rs: <span class="price" id="cartTotal1"><b> {{Session::get('cart')['amount']}}</b></h5>
+                            <h5 class="font-weight-bold">Rs: <span class="price" id="cartTotal1"><b> {{$tot}}</b></h5>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Shipping Fee</h5>
-                            <h5 class="font-weight-bold">Rs: <span id="price"><b> {{ Session::has('cart') ? App\Helpers\Cart::ship() : 0 }}</b></h5>
+                            <h5 class="font-weight-bold">Rs: <span id="price"><b> {{ Session::has('cart') ? $setting->shipping_charges : 0 }}</b></h5>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold">Rs: <span class="price" id="cartTotal"><b> {{Session::get('cart')['amount']}}</b></h5>
+                            <h5 class="font-weight-bold">Rs: <span class="price" id="cartTotal"><b> {{$tot +$setting->shipping_charges}}</b></h5>
                         </div>
                         <a href="/checkout" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</a>
                     </div>
@@ -141,7 +140,8 @@ use App\Models\Admins\Gallerie;
       
       $('.plus').click(function(){
          id = $(this).attr('productId');
-         price = $(this).attr('productprice');
+           var qty = $('#qty'+id).val();
+           price = $(this).attr('productprice');
           $.ajax({
               url : "{{url('cart/increment')}}",
               type : "POST",
@@ -150,18 +150,16 @@ use App\Models\Admins\Gallerie;
                   "_token": "{{ csrf_token() }}",
               },
               success:function(response){
-                 if(response.error){
-                    alert('Item out of stock');
-                 } else {
-                        qty=$('#spec'+id).val();
-                      updateView(response,price);
-                  } 
+                 qty++;
+                  $('#qty'+id).val(qty);
+                  updateView(response,price);
               }
           });
       });
 
       $('.minus').click(function(){
            id = $(this).attr('productId');
+           var qty = $('#qty'+id).val();
            price = $(this).attr('productprice');
           $.ajax({
               url : "{{url('cart/decrement')}}",
@@ -171,11 +169,10 @@ use App\Models\Admins\Gallerie;
                   "_token": "{{ csrf_token() }}",
               },
               success:function(response){
-                  if(qty > 0) $('#spec'+id).val(qty);
-                  else {
-                      removeFromView(id,response);
-                  }
+                  qty--;
+                  $('#qty'+id).val(qty);
                   updateView(response,price);
+                 
               }
           });
       });
@@ -184,7 +181,7 @@ use App\Models\Admins\Gallerie;
         productTotal=parseInt(qty*price);
           $('#cartValue').html(response.cart.qty);
           $('#price').html(response.cart.ship);
-          $('#cartTotal').html(response.cart.amount);
+          $('#cartTotal').html(response.cart.amount+{{ Session::has('cart') ? $setting->shipping_charges : 0 }});
           $('#cartTotal1').html(response.cart.amount);
           $('#productTotal'+id).html(productTotal);
       }

@@ -9,6 +9,62 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>FAQ Form</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" id="faq" method="post" action="/admin/faq" enctype="multipart/form-data">
+                        @csrf
+                        @if(isset($edit->id) && $edit->id)
+                        <input type="hidden" name="id" value="{{(isset($edit->id)?$edit->id:'')}}">
+                        @endif
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group"><label class="col-sm-12 ">Question:</label>
+                                    <div class="col-sm-12"><input type="text" value="<?php echo isset($edit->question) ? htmlspecialchars($edit->question) : null; ?>" required class="form-control" name="question"></div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="row">
+                            
+                            <div class="col-sm-12">
+                                <div class="form-group"><label class="col-sm-12 ">Answer:</label>
+                                <div class="col-sm-12"><textarea class="summernote" name="answer" id="answer" style="height:500px">
+                                            <?php echo isset($edit->answer) ? htmlspecialchars($edit->answer) : null; ?>
+        
+                                        </textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        @if(isset($edit->id) && $edit->id)
+                        <div class="row">
+                           <input type="hidden" name="hidden_id" value="{{isset($edit->id)?$edit->id:'';}}">
+                        </div>
+                        @endif
+                       
+                       
+                        
+                        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+                        <div class="form-group">
+                            <div class="col-sm-10"><button class="btn btn-md btn-primary" type="submit"><strong>Save</strong></button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                </div>
+                <div>
+                    
+                </div>
+            </div>
+        </div>
+      </div>
+    <div class="row">
+        <div class="col-lg-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h5>Faq's List</h5>
@@ -20,17 +76,18 @@
             <thead>
             <tr>
                 <th>Sr.No</th>
-                <th>Name</th>
                 <th>Questions</th>
                 <th>Action</th>
             </tr>
             </thead>
             <tbody>
               @php $sr=1; @endphp
+              @if(isset($sliders))
+              @php
+              @endphp
               @foreach ($sliders as $item)
                   <tr>
                     <td>{{$sr++}}</td>
-                    <td>{{$item->name}}</td>
                     <td>{{$item->question}}</td>
             
                     <td>
@@ -39,6 +96,7 @@
                     </td>
                   </tr>
               @endforeach
+              @endif
             </tbody>
             </table>
                 </div>

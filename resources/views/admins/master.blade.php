@@ -8,6 +8,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>@yield('title')</title>
+  <style>
+.ck-editor__editable_inline {
+    min-height: 400px;
+}
+</style>
 
   <link href="{{ asset('backend_assets/css/bootstrap.min.css')}}" rel="stylesheet">
   <link href="{{ asset('backend_assets/font-awesome/css/font-awesome.css')}}" rel="stylesheet">
@@ -18,8 +23,6 @@
   <link href="{{ asset('backend_assets/css/style.css')}}" rel="stylesheet">
   <link href="{{ asset('backend_assets/css/plugins/select2/select2.min.css')}}" rel="stylesheet">
 
-  <link href="{{ asset('backend_assets/css/plugins/summernote/summernote.css')}}" rel="stylesheet">
-  <link href="{{ asset('backend_assets/css/plugins/summernote/summernote-bs3.css')}}" rel="stylesheet">
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/bootstrap.tagsinput/0.8.0/bootstrap-tagsinput.css" rel="stylesheet"/>
@@ -62,6 +65,7 @@
                                 class="fa arrow"></span></a>
                         <ul class="nav nav-second-level collapse @yield('category_active_c1') @yield('category_active_c2') @yield('category_active_c3')">
                             <li class="@yield('category_child_1_active')"><a href="{{route('admins.category')}}">Category</a></li>
+                            <li class="@yield('category_child_2_active')"><a href="{{route('admins.subcategory')}}">Sub Category</a></li>
                             <li style="display:none;" class="@yield('category_child_3_active')"><a href="{{route('admins.brand')}}">Brand</a></li>
                         </ul>
                     </li>
@@ -128,16 +132,12 @@
                     </li>
                     <li class="@yield('media')"> 
                         <a href="{{route('admins.media')}}"><i class="fa fa-image"></i> <span
-                                class="nav-label">Media</span> </a>
+                                class="nav-label">Social Media</span> </a>
                     </li>
                     <!-- <li class="@yield('learn_setting')"> -->
                     <!--    <a href="{{route('admins.learn_setting')}}"><i class="fa fa-cog" ></i> <span-->
                     <!--            class="nav-label">Learn Settings</span> </a>-->
                     <!--</li>-->
-                    <li class="@yield('news_letter_active')" style="display:;" > 
-                        <a href="{{route('admins.news_letters')}}"><i class="fa fa-users"></i> <span
-                                class="nav-label">News Letters</span> </a>
-                    </li>
                     <li class="@yield('review')" style="display:;" > 
                         <a href="{{route('admins.review')}}"><i class="fa fa-book"></i> <span
                                 class="nav-label">Reviews</span> </a>
@@ -616,7 +616,8 @@
     <!-- Select2 -->
     <script src="{{ asset('backend_assets/js/plugins/select2/select2.full.min.js')}}"></script>
     <!-- SUMMERNOTE -->
-<script src="{{ asset('backend_assets/js/plugins/summernote/summernote.min.js')}}"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote-bs4.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote-bs4.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -741,25 +742,24 @@
 
 
     </script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/40.2.0/classic/ckeditor.js"></script>
     <script>
-        $(document).ready(function(){
-    
-            $('.summernote').summernote(
+    $('.summernote').summernote(
                 {
                 height: 150
                 }
                 );
-    
-            // $('.input-group.date').datepicker({
-            //     todayBtn: "linked",
-            //     keyboardNavigation: false,
-            //     forceParse: false,
-            //     calendarWeeks: true,
-            //     autoclose: true
-            // });
-    
-        });
-    </script>
+              /*          $('textarea').each(function(i, obj) {
+    ClassicEditor
+                                .create( document.querySelector( '#'+$(this).attr('id') ) )
+                                .then( editor => {
+                                        console.log( editor );
+                                } )
+                                .catch( error => {
+                                        console.error( error );
+                                } );
+});*/
+                </script>
     @stack('scripts')
 </body>
 

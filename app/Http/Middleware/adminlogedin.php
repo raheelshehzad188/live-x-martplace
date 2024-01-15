@@ -16,8 +16,13 @@ class adminlogedin
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!session()->has('admin')) {
-            return redirect('admin/login');
+        if(!isset($_SESSION)) 
+    { 
+        session_start();
+    }
+        if(!isset($_SESSION['admin']))
+        {
+        return redirect('admin/login');
         }
         return $next($request);
     }

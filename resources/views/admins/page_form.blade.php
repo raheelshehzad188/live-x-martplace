@@ -40,10 +40,17 @@
                         </div>
                         <div class="form-group"><label class="col-sm-12 control-label">Menu Type:</label>
                             <div class="col-sm-12">
+                                <?php
+                                $types = array(
+                                    'top_bar'=>'Top Bar',
+                                    'header'=>'Header',
+                                    'quick_links'=>'Quick Links',
+                                    );
+                                ?>
                             <select class="form-control" name="menu_type" id="menu_type">
-                                <option value="normal" <?= (isset($edit) && $edit->menu_type == 'normal' ) ? "Selected" : ''; ?>>Normal</option>
-                                <option value="category" <?= (isset($edit) && $edit->menu_type == 'category' ) ? "Selected" : ''; ?>>Category</option>
-                                <option value="product" <?= (isset($edit) && $edit->menu_type == 'product' ) ? "Selected" : ''; ?>>Product</option>
+                                @foreach($types as $k=> $v)
+                                <option value="{{ $k }}" <?= (isset($edit) && $edit->menu_type == $k ) ? "Selected" : ''; ?>>{{ $v }}</option>
+                                @endforeach
                             </select>
                             </div>
                         </div>
@@ -56,20 +63,6 @@
                                 $slug = 'category/'.$cat->slug;
                                 ?>
                                 <option value="{{$slug}}"  <?= (isset($edit->route) && $edit->route == $slug)?"selected":"" ?>>{{$cat->name}}</option>
-                                @endforeach
-                            </select>
-                            </div>
-                        </div>
-                        </div>
-                        <div id="product" class="all_typs"  style="display:<?= (isset($edit) && $edit->menu_type == 'product' ) ? "block" : 'none'; ?>">
-                            <div class="form-group"><label class="col-sm-12 control-label">Select Product:</label>
-                            <div class="col-sm-12">
-                            <select required="" class="form-control get_route" name="product">
-                                @foreach ($products as $cat)
-                                <?php
-                                $slug = 'product/'.$cat->slug;
-                                ?>
-                                <option value="{{$slug}}" <?= (isset($edit->route) && $edit->route == $slug)?"selected":"" ?>>{{$cat->product_name}}</option>
                                 @endforeach
                             </select>
                             </div>
@@ -94,26 +87,6 @@
                             </div>
                         </div>
                         @endif
-                        <div class="form-group"><label class="col-sm-12 control-label">Parent page:</label>
-                            <div class="col-sm-12">
-                            <select required="" class="form-control" name="parent">
-                                <option value="2" <?= (isset($edit) && $edit->parent == 0 ) ? "Selected" : ''; ?>>Parent page</option>
-                                @foreach ($page as $spage)
-                                    <option value="{{$spage->id}}" <?= (isset($edit) && $edit->parent == $spage->id ) ? "Selected" : ''; ?>>{{$spage->name}}</option>
-                                @endforeach
-                            </select>
-                            </div>
-                        </div>
-                        <div class="form-group"><label class="col-sm-12 control-label">Menu section:</label>
-                            <div class="col-sm-12">
-                            <select required="" class="form-control" name="sections">
-                                <option value="2" <?= (isset($edit) && $edit->section == 0 ) ? "Selected" : ''; ?>>Parent page</option>
-                                @foreach ($sections as $spage)
-                                    <option value="{{$spage->id}}" <?= (isset($edit) && $edit->section == $spage->id ) ? "Selected" : ''; ?>>{{$spage->name}}</option>
-                                @endforeach
-                            </select>
-                            </div>
-                        </div>
                         
                         <div class="form-group"><label class="col-sm-12 control-label">Page Content:</label>
                             <div class="col-sm-12">
@@ -124,25 +97,6 @@
                             </div>
                         </div>
                        
-                       <div class="form-group">
-                            <label class="col-sm-12 control-label"> Banner Image:</label>
-                            <!--<input type="file" require  accept="image/png, image/gif, image/jpeg" class="form-control" <?php echo isset($edit->video_link) ? 'required' : ''; ?>   name="logo">-->
-                            <div class="col-sm-12"><input type="file" accept="image/png, image/gif, image/jpeg" class="form-control" name="page_image_one">
-                            @if($edit)
-                            <img src=" {{asset('')}}public/img/slider/{{$edit->page_image}}"  alt="" <?php echo ($edit->page_image != null) ? 'style="width:100px;"' : 'style="display:none;width:100px;"'; ?>></div>
-                            @endif
-                        </div>
-                        
-                    @if($edit)
-                        <div class="form-group"><label class="col-sm-12 control-label">Page image status:</label>
-                            <div class="col-sm-12">
-                            <select required="" class="form-control" name="image_status">
-                                <option value="1" <?= (isset($edit) && $edit->status == 1 ) ? "Selected" : ''; ?> >Active</option>
-                                <option value="2" <?= (isset($edit) && $edit->status == 2 ) ? "Selected" : ''; ?>>Deactive</option>
-                            </select>
-                            </div>
-                        </div>
-                        @endif
                        
                        
                         @if(isset($edit->id))

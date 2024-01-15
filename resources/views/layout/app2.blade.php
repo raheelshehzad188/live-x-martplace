@@ -2,6 +2,8 @@
 use App\Models\Admins\Pages;
 use App\Models\Admins\Setting;
 $Site= Setting::where(['id'=>'1'])->first();
+
+
   ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,6 +38,7 @@ $Site= Setting::where(['id'=>'1'])->first();
     <meta name="bingbot" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
     <link rel="canonical" href="" />
     <link rel="alternate" type="application/rss+xml" href="{{ url('/'); }}/sitemap.xml" />
+    
     @if(isset($meta->scheme1))
     <script type="application/ld+json">
     {{$meta->scheme1}}
@@ -48,7 +51,7 @@ $Site= Setting::where(['id'=>'1'])->first();
     @endif
     
 
-@elseif(isset($tags))
+@elseif(isset($tags) && !is_array($tags))
 
     <title>{{ $tags }}</title>
     <meta name="title" content="{{ $tags }}" />
@@ -74,6 +77,7 @@ $Site= Setting::where(['id'=>'1'])->first();
     <!--<link rel="icon" type="image/x-icon" href="{{asset('')}}/images/favicon.png">-->
     <link rel="shortcut icon" href="{{asset('')}}{{$Setting->logo1}}" type="image/x-icon"/ >
     @endforeach
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <!-- BEGIN: Page CSS-->
     <!-- Google Web Fonts -->
@@ -89,7 +93,11 @@ $Site= Setting::where(['id'=>'1'])->first();
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="{{asset('')}}front/css/style.css" rel="stylesheet">
-
+    <?php
+    $color = '#fff';
+    ?>
+<style>
+</style>
 
 </head> 
 
@@ -102,10 +110,47 @@ $Site= Setting::where(['id'=>'1'])->first();
 
         <!-- BEGIN: Content-->
         @yield('content')
+        
         <!-- BEGIN: End content-->
 
         <!-- Footer Area -->
         {{ view('front.footer1') }}
+        <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <ul class="cart-list link-dropdown-list">
+                    <table class="table table-image">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Product</th>
+              <th scope="col">Price</th>
+              <th scope="col">Qty</th>
+              <th scope="col">Total</th>
+              <!--<th scope="col">Actions</th>-->
+            </tr>
+          </thead>
+          <tbody id="cart_data">
+             
+          </tbody>
+        </table> 
+                    
+                      
+                     
+                    </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
         <!-- End Footer Area -->
 
    <!-- Back to Top -->
@@ -117,10 +162,194 @@ $Site= Setting::where(['id'=>'1'])->first();
    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
    <script src="{{asset('')}}front/lib/easing/easing.min.js"></script>
    <script src="{{asset('')}}front/lib/slick/slick.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 
    <!-- Template Javascript -->
    <script src="{{asset('')}}front/js/main.js"></script>
+   <script>
+  $(document).ready(function() {
+      $('.btn-plus').click(function(){
+          var qty = $('#qty').val();
+          qty++;
+          $('#qty').val(qty);
+      });
+      $('.btn-minus').click(function(){
+          var qty = $('#qty').val();
+          qty--;
+          $('#qty').val(qty);
+      });
+    $('.add-to-cart').click(function(e) {
+        e.preventDefault();
+        let id = $(this).attr('id');
+        let qty = $('#qty').val();
+        $.ajax({
+            url: "/cart/add",
+            method: "POST",
+            data: {
+                id: id,
+                qty: qty,
+                "_token": "{{ csrf_token() }}",
+            },
+            success: function(response) {
+                if (response.error) {
+                    // Handle error response
+                } else {
+                    $('#cartValue').html(response.qty);
+                    $('#cartValue1').html(response.qty);
+                    $('#cartValue2').html(response.qty);
+                    Swal.fire({
+  title: "Good job!",
+  text: response.msg,
+  icon: "success"
+});
+                    $.post('{{ route('cart_data') }}', {_token:'{{ csrf_token() }}'}, function(data){
+                        $('#cart_data').html(data);
+                    });
+                    $.post('{{ route('hearder_cart') }}', {_token:'{{ csrf_token() }}'}, function(data){
+                        $('#hearder_cart').html(data);
+                    });
+                    $('#myModal').modal({ show: true });
+                }
+            },
+            cache: false // Disable caching for the AJAX response
+        });
+    });
+});
+       $(document).ready(function() {
+    $('.add-to-cart-item').click(function(e) {
+        e.preventDefault();
+        let id = $(this).attr('id');
+        let qty = $('#qty').val();
+        $.ajax({
+            url: "/cart/add",
+            method: "POST",
+            data: {
+                id: id,
+                qty: qty,
+                "_token": "{{ csrf_token() }}",
+            },
+            success: function(response) {
+                if (response.error) {
+                    // Handle error response
+                } else {
+                    $('#cartValue').html(response.qty);
+                    $('#cartValue1').html(response.qty);
+                    $('#cartValue2').html(response.qty);
+                    Swal.fire({
+  title: "Good job!",
+  text: response.msg,
+  icon: "success"
+});
+                    $.post('{{ route('hearder_cart') }}', {_token:'{{ csrf_token() }}'}, function(data){
+                        $('#hearder_cart').html(data);
+                    });
+                }
+            },
+            cache: false // Disable caching for the AJAX response
+        });
+    });
+});
+
+         $(document).ready(function() {
+            $('.add-to-cart-item1').click(function(e) {
+               e.preventDefault();
+               
+                let id = $(this).attr('id');
+
+                $.ajax({
+                    url: "/cart/add",
+                    method: "POST",
+                    data: {
+                        id: id,
+                        "_token": "{{ csrf_token() }}",
+                    },
+                    success: function(response) {
+                        if (response.error) {
+
+
+                        } else {
+                             window.location.href = "/checkout";
+                            
+                           
+                        }
+                    }
+                });
+            });
+        });
+        
+        function showToastr(msg,msg_type)
+        {
+            switch(msg_type)
+                {
+                    case "success":
+                    toastr.success(msg);
+                    break;
+
+                    case "danger":
+                    toastr.error(msg)
+                    break;
+
+                    case "info":
+                    toastr.info(msg)
+                    break;
+                    
+                    case "warning":
+                    toastr.warning(msg)
+                    break;
+                }
+        }
+        
+        $(document).ready(function(){
+
+            let msg_type="";
+            let msg="";
+            @if(Session::has('msg'))
+            msg_type="{{Session::get('msg_type')}}";
+            // alert();
+            msg="{{Session::get('msg')}}";
+            @endif
+
+            if(msg!="")
+            {
+                switch(msg_type)
+                {
+                    case "success":
+                    Swal.fire({
+  title: "Good job!",
+  text: msg,
+  icon: "success"
+});
+                    break;
+
+                    case "danger":
+                    Swal.fire({
+  title: "Oops...",
+  text: msg,
+  icon: "error"
+});
+                    break;
+
+                    case "info":
+                    toastr.info(msg)
+                    break; 
+                    
+                    case "warning":
+                    toastr.warning(msg)
+                    break;
+                }
+            }
+
+
+
+
+
+        });
+        
+        
+    </script>
+    @yield('script')
 </body>
 </html>
 

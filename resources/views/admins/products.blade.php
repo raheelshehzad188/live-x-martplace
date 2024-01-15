@@ -105,7 +105,7 @@ use App\Models\Admins\Gallerie;
                             'X-CSRF-TOKEN': "{{csrf_token()}}",
                         },
                     url : "{{route('admins.update_product_status')}}",
-                    type : "POST",
+                    type : "GET",
                     data : {
                         product_id : product_id,
                         Status : status,

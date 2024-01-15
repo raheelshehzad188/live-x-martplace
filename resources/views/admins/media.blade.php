@@ -16,18 +16,34 @@
                 <div class="ibox-content">
                     <form class="form-horizontal" method="post" enctype="multipart/form-data">
                         @csrf
+                        @if(isset($edit->id))
+                        <input type="hidden" name="hidden_id" value="{{$edit->id}}">
+                        @endif
                         <div class="form-group" >
-                            <label class="col-lg-4 control-label">Media:</label>
-                            <div class="col-lg-8">
-                            <input type="file" onchange="readURL(this);" <?php echo isset($edit->id) ? null : "required"; ?> accept="image/png, image/gif, image/jpeg" class="form-control" name="name">
-                            <img src="<?php echo isset($edit->name) ? asset($edit->name) : null; ?>"  alt="" <?php echo isset($edit->name) ? 'style="width:100px;"' : 'style="display:none;width:100px;"'; ?>>
+                            <label class="col-lg-12 ">Name:</label>
+                            <div class="col-lg-12">
+                            <input type="text" class="form-control" name="name" value="{{ (isset($edit->name)?$edit->name:null) }}"/>
                             </div>
                             
                        
                         </div>
-                        @if(isset($edit->id))
-                        <input type="hidden" name="hidden_id" value="{{$edit->id}}">
-                        @endif
+                        <div class="form-group" >
+                            <label class="col-lg-12 ">Icon:</label>
+                            <div class="col-lg-12">
+                            <input type="text" class="form-control" name="icon" value="{{ (isset($edit->icon)?$edit->icon:null) }}"/>
+                            </div>
+                            
+                       
+                        </div>
+                        <div class="form-group" >
+                            <label class="col-lg-12 ">Link:</label>
+                            <div class="col-lg-12">
+                            <input type="text" class="form-control" name="link" value="{{ (isset($edit->link)?$edit->link:null) }}"/>
+                            </div>
+                            
+                       
+                        </div>
+                        
                         <div class="form-group"><label class="col-lg-4 control-label"></label>
 
                             <div class="col-lg-8">                  <button class="btn btn-sm btn-primary" type="submit"><strong>Save</strong></button>

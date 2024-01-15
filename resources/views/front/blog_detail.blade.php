@@ -1,20 +1,18 @@
-@extends('layout.app')
+@extends('layout.app2')
 @section('content')
  <!-- Bread Crumb STRAT -->
-  <div class="banner inner-banner1 ">
-    <div class="container">
-      <section class="banner-detail center-xs">
-        <h1 class="banner-title">>Blog Detail</h1>
-        <div class="bread-crumb right-side float-none-xs">
-          <ul>
-            <li><a href="">Home</a>/</li>
-            <li><a href="/blog">Blog</a>/</li>
-            <li><span>>Blog Detail</span></li>
-          </ul>
+  
+<div class="container-fluid">
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <nav class="breadcrumb bg-light mb-30">
+                    <a class="breadcrumb-item text-dark" href="/">Home</a>
+                    <a class="breadcrumb-item text-dark" href="/blog/{{$blog[0]->slug}}">Blog</a>
+                    <span class="breadcrumb-item active">{{$blog[0]->title_english}}</span>
+                </nav>
+            </div>
         </div>
-      </section>
     </div>
-  </div>
   <!-- Bread Crumb END -->
 
   <!-- CONTAIN START -->
@@ -22,7 +20,7 @@
   <section class="ptb-95">
     <div class="container">
       <div class="row">
-        <div class="col-md-9 pb-xs-60">
+        <div class="col-md-12 pb-xs-60">
           <div class="row">
             <div class="col-xs-12 mb-60">
               <div class="blog-media mb-30"> 
@@ -90,52 +88,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="sidebar-block">
-            <div class="sidebar-box mb-40">
-              <form>
-                <div class="search-box">
-                  <input type="text" placeholder="Search entire store here..." class="input-text">
-                  <button class="search-btn"></button>
-                </div>
-              </form>
-            </div>
-            <div class="sidebar-box listing-box mb-40"> <span class="opener plus"></span>
-              <div class="sidebar-title">
-                <h3>Categories</h3><span></span>
-              </div>
-              <div class="sidebar-contant">
-                <ul>
-                    @foreach($bcate as $cate)
-                  <li><a href="/blog_category/{{$cate->slug}}">{{$cate->title_english}}</a></li>
-                  @endforeach
-                </ul>
-              </div>
-            </div>
-            <div class="sidebar-box sidebar-item sidebar-item-wide"> <span class="opener plus"></span>
-              <div class="sidebar-title">
-                <h3>Recent Post</h3><span></span>
-              </div>
-              <div class="sidebar-contant">
-                <ul>
-                     <?php 
-                        $pro = DB::table('posts')->limit('4')->orderBy('id','DESC')->get();
-                    ?>
-                    @foreach($pro as $p)
-                    
-                  <li>
-                    <div class="pro-media"> <a><img alt="T-shirt" src="{{asset($p->image)}}"></a> </div>
-                    <div class="pro-detail-info"> <a href="/blog/{{$p->slug}}">{{$p->title_english}}</a>
-                      <div class="post-info">{{date(" F d Y ",strtotime($p->created_at))}}</div>
-                    </div>
-                  </li>
-                  @endforeach
-                  
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </div>
   </section>

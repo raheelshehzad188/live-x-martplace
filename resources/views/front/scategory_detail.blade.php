@@ -9,7 +9,7 @@ $cate = Category::limit('6')->get();
             <div class="col-12">
                 <nav class="breadcrumb bg-light mb-30">
                     <a class="breadcrumb-item text-dark" href="{{ url('/') }}">Home</a>
-                    <a class="breadcrumb-item text-dark" href="{{ url($category_id->slug) }}">{{$category_id->name}}</a>
+                    <a class="breadcrumb-item text-dark" href="{{ url('category/'.$pcategory->slug) }}">{{$pcategory->name}}</a>
                     <span class="breadcrumb-item active">{{ $category_id->name }}</span>
                 </nav>
             </div>

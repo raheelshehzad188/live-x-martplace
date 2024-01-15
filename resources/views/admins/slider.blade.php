@@ -22,8 +22,20 @@
                                 <span class="help-block m-b-none text-danger">{{$message}}</span>
                                 @enderror
                                 @if(isset($edit->id))
-                                <img style="width:100px;" src="{{asset('')}}img/slider/{{$edit->slider_image}}" />
+                                <img style="width:100px;" src="{{asset('')}}public/img/slider/{{$edit->slider_image}}" />
                                 @endif
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group"><label class="col-sm-12 control-label"> Discription:</label>
+                                    <div class="col-sm-12">
+                                        <textarea class="summernote" name="p" id="short_discriiption" style="height:500px">
+                                            <?php echo isset($edit->p) ? htmlspecialchars($edit->p) : null; ?>
+        
+                                        </textarea>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         @if(isset($edit->id))
@@ -62,7 +74,7 @@
               @foreach ($sliders as $item)
                   <tr>
                     <td>{{$sr++}}</td>
-                    <td><img style="width:100px;" src="{{asset('')}}/img/slider/{{$item->slider_image}}"/></td>
+                    <td><img style="width:100px;" src="{{asset('')}}public/img/slider/{{$item->slider_image}}"/></td>
                     <td>{{$item->created_at}}</td>
             
                     <td>

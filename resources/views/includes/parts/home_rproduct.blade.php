@@ -1,41 +1,10 @@
-<!-- Recent Product Start -->
-<div class="recent-product">
-    <div class="container">
-        <div class="section-header">
-            <h3>Recent Product</h3>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra at massa sit amet ultricies. Nullam consequat, mauris non interdum cursus
-            </p>
-        </div>
-        <div class="row align-items-center product-slider product-slider-4">
+<!--Feater start-->
+<div class="container-fluid pt-5 pb-3">
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Recent Products</span></h2>
+        <div class="row px-xl-5">
             @foreach ($aproducts as  $k=>$v)
-                <div class="col-lg-3">
-                    <div class="product-item">
-                        <div class="product-image">
-                            <a href="{{asset(' ')}}public/product/{{$v->slug}}">
-                                <img  src="{{asset($v->image_one)}}" alt="{{$v->product_name}}">
-                            </a>
-                            <div class="product-action">
-                                <a href="#"><i class="fa fa-cart-plus"></i></a>
-                                <a href="#"><i class="fa fa-heart"></i></a>
-                                <a href="#"><i class="fa fa-search"></i></a>
-                            </div>
-                        </div>
-                        <div class="product-content">
-                            <div class="title"><a href="{{asset('')}}public/product/{{$v->slug}}">{{$v->product_name}}</a></div>
-                            <div class="ratting">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                            </div>
-                            <div class="price">Rs{{$v->discount_price}} <span>Rs {{$v->selling_price}}</span></div>
-                        </div>
-                    </div>
-                </div>
+            @include('includes/parts/product_box')
             @endforeach
         </div>
     </div>
-</div>
-<!-- Recent Product End -->
+<!--Feater end-->

@@ -6,7 +6,7 @@ use App\Http\Controllers\Front;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Web Routes/
 |--------------------------------------------------------------------------
 |
 | Here is where you can register web routes for your application. These
@@ -32,7 +32,7 @@ Route::name('admins.')->prefix('/admin')->group(function () {
     Route::post('/login',[Admins\AdminController::class,'admin_login_submit'])->name('admin_login_submit');
     Route::get('/logout', [Admins\AdminController::class,'logout']);
 
-    Route::middleware(['adminlogedin'])->group(function () { 
+    Route::middleware([])->group(function () { 
 
         Route::get('/dashboard',[Admins\AdminController::class,'dashboard'])->name('dashboard')->middleware('adminlogedin');
     
@@ -75,7 +75,7 @@ Route::name('admins.')->prefix('/admin')->group(function () {
         Route::get('/pages/delete/{id}',[Admins\AdminController::class,'page_delete'])->name('page_delete');
         Route::get('/sections/delete/{id}',[Admins\AdminController::class,'section_delete'])->name('section_delete');
         Route::post('/get_subCategory_html',[Admins\AdminController::class,'get_subCategory_html'])->name('get_subCategory_html');
-        Route::post('/update_product_status',[Admins\AdminController::class,'update_product_status'])->name('update_product_status');
+        Route::any('update_product_status',[Admins\AdminController::class,'update_product_status'])->name('update_product_status');
         Route::post('/update_review_status',[Admins\AdminController::class,'update_review_status'])->name('update_review_status');
         Route::any('/review',[Admins\AdminController::class,'review'])->name('review');
         Route::get('/review/delete/{id}',[Admins\AdminController::class,'review_delete'])->name('review_delete');
@@ -101,6 +101,7 @@ Route::name('admins.')->prefix('/admin')->group(function () {
 });
 
 
+Route::get('/home',[Front\FrontController::class,'home1'])->name('home1');
 Route::get('/',[Front\FrontController::class,'home1'])->name('home1');
 Route::get('/sitemap',[Front\FrontController::class,'index'])->name('sitemap');
 Route::get('/categories_sitemap',[Front\FrontController::class,'categories'])->name('categories_sitemap');
@@ -108,9 +109,12 @@ Route::get('/products_tag',[Front\FrontController::class,'products_tag'])->name(
 Route::get('/shop/{id}',[Front\FrontController::class,'shop'])->name('shop');
 Route::any('/shop',[Front\FrontController::class,'shop'])->name('shop');
 Route::get('/product/{id}',[Front\FrontController::class,'product_detail']);
+Route::get('/wishlist/{id}',[Front\FrontController::class,'wishlist']); 
+Route::get('/my_wishlist',[Front\FrontController::class,'my_wishlist']); 
 Route::get('/blog',[Front\FrontController::class,'blogs']);
 Route::get('/blog/{id}',[Front\FrontController::class,'blog_detail']);
 Route::get('/category/{id}',[Front\FrontController::class,'category_detail']);
+Route::get('/subcategory/{id}',[Front\FrontController::class,'scategory_detail']);
 Route::get('/blog_category/{id}',[Front\FrontController::class,'blog_category']);
 Route::get('/shape/{id}',[Front\FrontController::class,'shape_detail']);
 Route::get('/brand/{id}',[Front\FrontController::class,'brand_detail']);
@@ -134,9 +138,7 @@ Route::get('checkout', [Front\FrontController::class,'checkout']);
 Route::get('guest_checkout', [Front\FrontController::class,'guest_checkout']);
 Route::get('track_order', [Front\FrontController::class,'track_order']);
 
-Route::get('/page/{id}',[Front\FrontController::class,'page_detail']);
-Route::get('/about',[Front\FrontController::class,'about'])->name('about');
-Route::get('/learn',[Front\FrontController::class,'learn'])->name('learn');
+
 Route::get('/faq',[Front\FrontController::class,'faq'])->name('faq');
 Route::post('/order',[Front\FrontController::class,'order'])->name('order');
 Route::post('/cart_data',[Front\FrontController::class,'cart_data'])->name('cart_data');
@@ -160,6 +162,7 @@ Route::any('/get_selected_price',[Front\FrontController::class,'get_selected_pri
 Route::post('/cart/add', [Front\CartController::class,'add'])->name('cart');
 Route::POST('/subcribe_newsletter',[Front\FrontController::class,'subcribe_newsletter'])->name('subcribe_newsletter');
 Route::any('/forget_pass',[Front\FrontController::class,'forget_pass'])->name('forget_pass');
+Route::get('/{id}',[Front\FrontController::class,'page_detail']);
 
 
 

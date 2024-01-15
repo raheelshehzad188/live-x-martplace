@@ -1,38 +1,24 @@
-<!-- Category Start-->
-        <div class="category">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="category-img">
-                            <img src="{{asset('')}}front/img/category-1.jpg" />
-                            <a class="category-name" href="">
-                                <h2>Category Name</h2>
-                            </a>
-                        </div>
+<!-- Categories Start -->
+<div class="container-fluid pt-5">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Categories</span></h2>
+    <div class="row px-xl-5 pb-3">
+        @foreach($categories as $k=> $v)
+        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+            <a class="text-decoration-none" href="{{ url('/category') }}/{{$v->slug}}">
+                <div class="cat-item d-flex align-items-center mb-4">
+                    <div class="overflow-hidden" style="width: 100px; height: 100px;">
+                        @if($v->image)
+                        <img style="height: 100%;object-fit: cover;" class="img-fluid" src="{{ $v->image}}" alt="">
+                        @endif
                     </div>
-                    <div class="col-md-4">
-                        <div class="category-img">
-                            <img src="{{asset('')}}front/img/category-3.jpg" />
-                            <a class="category-name" href="">
-                                <h2>Category Name</h2>
-                            </a>
-                        </div>
-                        <div class="category-img">
-                            <img src="{{asset('')}}front/img/category-4.jpg" />
-                            <a class="category-name" href="">
-                                <h2>Category Name</h2>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="category-img">
-                            <img src="{{asset('')}}front/img/category-2.jpg" />
-                            <a class="category-name" href="">
-                                <h2>Category Name</h2>
-                            </a>
-                        </div>
+                    <div class="flex-fill pl-3">
+                        <h6>{{$v->name}}</h6>
+                        <small class="text-body">{{$v->prod}} Products</small>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
-        <!-- Category End-->
+        @endforeach
+    </div>
+</div>
+<!-- Categories End -->

@@ -18,6 +18,13 @@ use App\Models\Admins\Brand;
   ?>
 
 @section('content')
+<?php
+$types = array(
+                                    'top_bar'=>'Top Bar',
+                                    'header'=>'Header',
+                                    'quick_links'=>'Quick Links',
+                                    );
+?>
 <div class="wrapper wrapper-content animated fadeInRight">
 <div class="row">
         <div class="col-lg-12">
@@ -33,6 +40,7 @@ use App\Models\Admins\Brand;
             <tr>
                 <th>#</th>
                 <th>Page</th>
+                <th>Menu Type</th>
                 <th>Postion</th>
                 <th>Action</th>
             </tr>
@@ -43,6 +51,7 @@ use App\Models\Admins\Brand;
                     
                     <td><?= $key+1 ?></td>
                     <td>{{$page->name}}</td>
+                    <td>{{(isset($types[$page->menu_type])?$types[$page->menu_type]:'None')}}</td>
                     <td>{{$page->position}}</td>
                     <td>
                         <a href="{{route('admins.page_form',$page->id)}}" class="btn btn-success btn-sm"><i class="fa fa-edit"></i>&nbsp;Edit</a>

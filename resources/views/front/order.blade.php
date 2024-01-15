@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layout.app2')
 <?php
 use App\Models\Catagorie;
 use App\Models\Subcatagorie;
@@ -11,19 +11,11 @@ use App\Models\Admins\Rating;
 use App\Models\Admins\Slider;
   ?>
   @section('content')
-  <!-- Page Header Start -->
-    <div class="container-fluid bg-secondary mb-5">
-        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
-            <h1 class="font-weight-semi-bold text-uppercase mb-3">Checkout</h1>
-            <div class="d-inline-flex">
-                <p class="m-0"><a href="">Home</a></p>
-                <p class="m-0 px-2">-</p>
-                <p class="m-0">Checkout</p>
-            </div>
-        </div>
-    </div>
-    <!-- Page Header End -->
-
+<?php $setting = DB::table('setting')
+    ->where('id', '=', '1')
+    ->first();
+$cate = DB::table('categories')->get();
+?>
 
     <!-- Checkout Start -->
     <form action="/order_submit" method="post" class="main-form full">
@@ -112,11 +104,17 @@ use App\Models\Admins\Slider;
                             <h4>Qty</h4>
                             <h4>Price</h4>
                         </div>
+                        @php
+                        $tot = 0;
+                        @endphp
                         @foreach (App\Helpers\Cart::products() as $product)
+                        @php
+                        $tot = $tot+ ($product->discount_price* $product->qty);
+                        @endphp
                         <div class="d-flex justify-content-between">
-                            <p>{{$product->product_name}}</p>
+                            <p>{{$product->product_name}}({{$product->discount_price}})</p>
                             <p>{{$product->qty}}</p>
-                            <p>RS:{{$product->discount_price}}</p>
+                            <p>RS:{{$product->discount_price * $product->qty}}</p>
                         </div>
                         @endforeach
                         
@@ -125,11 +123,11 @@ use App\Models\Admins\Slider;
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Shipping Fee</h5>
-                            <h5 class="font-weight-bold">Rs:200</h5>
+                            <h5 class="font-weight-bold">Rs:{{$setting->shipping_charges}}</h5>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold">Rs:{{Session::get('cart')['amount']+200}}</h5>
+                            <h5 class="font-weight-bold">Rs:{{$tot+$setting->shipping_charges}}</h5>
                         </div>
                     </div>
                 </div>

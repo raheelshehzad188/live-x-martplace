@@ -41,12 +41,12 @@
                           <input type="text" required name="name" value="{{isset($edit->name) ? $edit->name : ""}}" id="exampleInputEmail2" class="form-control">
                         </div>
                         
-                        <!--<div class="form-group" style="display: flex;flex-direction: column;">-->
-                        <!--    <label for="exampleInputEmail2">Featured image (Main Thumbnail):</label>-->
-                        <!--    <input type="file" onchange="readURL(this);" <?php echo isset($edit->id) ? null : "required"; ?> accept="image/png, image/gif, image/jpeg" class="form-control" name="image_one">-->
-                        <!--    <img src="<?php echo isset($edit->image) ? asset($edit->image) : null; ?>"  alt="" <?php echo isset($edit->image) ? 'style="width:100px;"' : 'style="display:none;width:100px;"'; ?>>-->
+                        <div class="form-group" style="display: flex;flex-direction: column;">
+                            <label for="exampleInputEmail2">Featured image (Main Thumbnail):</label>
+                            <input type="file" onchange="readURL(this);" <?php echo isset($edit->id) ? null : "required"; ?> accept="image/png, image/gif, image/jpeg" class="form-control" name="image_one">
+                            <img src="<?php echo isset($edit->image) ? asset($edit->image) : null; ?>"  alt="" <?php echo isset($edit->image) ? 'style="width:100px;"' : 'style="display:none;width:100px;"'; ?>>
                        
-                        <!--</div>-->
+                        </div>
                         
                         <!--<div class="form-group">-->
                         <!--    <label>Featured:</label>-->
@@ -122,7 +122,7 @@
           <thead>
           <tr>
               <th>Sr.No</th>
-              <!--<th>Image</th>-->
+              <th>Image</th>
               <th>Category</th>
               <th>Creation Ago</th>
               <th>Action</th>
@@ -133,7 +133,7 @@
             @foreach ($categories as $item)
                 <tr>
                   <td>{{$sr++}}</td>
-                  <!--<td><img src="{{asset($item->image)}}" style="width:50px;" ></td>-->
+                 <td><img src="{{asset($item->image)}}" style="width:50px;" ></td>
                   <td>{{$item->name}}</td>
                   <td>{{\Carbon\Carbon::parse($item->created_at)->diffForHumans()}}</td>
                   <td>

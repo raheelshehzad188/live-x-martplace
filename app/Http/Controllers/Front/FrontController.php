@@ -54,6 +54,15 @@ class FrontController extends Controller
                 <changefreq>daily</changefreq>
                 </url>';
         }
+        $posts= Category::latest()->get();
+        foreach ($posts as $post)
+        {
+            $xml .= '<url>
+                <loc>'.url('category/').'/'.$post->slug.'</loc> 
+                <priority>1.0</priority>
+                <changefreq>daily</changefreq>
+                </url>';
+        }
     
         $xml .= '</urlset>';
         $myfile = fopen("sitemap.xml", "w") or die("Unable to open file!");
@@ -121,6 +130,7 @@ class FrontController extends Controller
          $page = "home";
         $Slider=Slider::all();
         $Rating=Rating::all();
+        
         $categories=Category::all();
         $shap = Shap::all();
         $setting = DB::table('setting')
@@ -190,7 +200,7 @@ class FrontController extends Controller
             $meta->scheme = $sch;
                         }
 
-
+ var_dump($posts);
 
         $products=Product::select('products.*')->orderBy('products.id','DESC')->get();
         $fproducts=Product::select('products.*')->where('Featured','1')->orderBy('products.id','DESC')->limit(10)->get();
@@ -198,10 +208,10 @@ class FrontController extends Controller
         $aproducts=Product::select('products.*')->where('New_Arrival','1')->orderBy('products.id','DESC')->limit(10)->get();
         $onslaeproducts=Product::select('products.*')->where('Sale','1')->orderBy('products.id','DESC')->limit(10)->get();
         $mostviewproducts=Product::select('products.*')->orderBy('view','DESC')->limit(10)->get();
-        $home_cats = DB::table('home_cats')->where('status','=',1)->orderBy('home_cats.sort')->get();
+        $home_cats = DB::table('home_cats')->where->orderBy('home_cats.sort')->get();
         Session::put('title','Home');
         
-        return view('front.home1',compact('page','products','categories','fproducts','setting','aproducts','mostviewproducts','Slider','Rating','meta','onslaeproducts','shap','home_cats'));
+        return view('front.home1',compact('page','products','categories','fproducts','setting','aproducts','mostviewproducts','Slider','Rating','meta','onslaeproducts','shap','home_cats','posts'));
     }
 
     public function home1(Request $request)
@@ -209,7 +219,14 @@ class FrontController extends Controller
          $page = "home";
         $Slider=Slider::all();
         $Rating=Rating::all();
+        $posts=Blog_Post::all();
         $categories=Category::all();
+        foreach($categories as $k=> $v)
+        {
+            
+        $fproducts=Product::where('status',1)->select('products.*')->where('category_id',$v->id)->orderBy('products.id','DESC')->get();
+        $categories[$k]->prod = count($fproducts);
+        }
         $shap = Shap::all();
         $setting = DB::table('setting')
             ->where('id', '=', '1')
@@ -280,16 +297,16 @@ class FrontController extends Controller
 
 
 
-        $products=Product::select('products.*')->orderBy('products.id','DESC')->get();
-        $fproducts=Product::select('products.*')->where('Featured','1')->orderBy('products.id','DESC')->limit(10)->get();
+        $products=Product::where('status',1)->select('products.*')->orderBy('products.id','DESC')->get();
+        $fproducts=Product::select('products.*')->where('Featured','1')->orderBy('products.id','DESC')->limit(8)->get();
 
-        $aproducts=Product::select('products.*')->where('New_Arrival','1')->orderBy('products.id','DESC')->limit(10)->get();
-        $onslaeproducts=Product::select('products.*')->where('Sale','1')->orderBy('products.id','DESC')->limit(10)->get();
-        $mostviewproducts=Product::select('products.*')->orderBy('view','DESC')->limit(10)->get();
+        $aproducts=Product::where('status',1)->select('products.*')->where('New_Arrival','1')->orderBy('products.id','DESC')->limit(8)->get();
+        $onslaeproducts=Product::where('status',1)->select('products.*')->where('Sale','1')->orderBy('products.id','DESC')->limit(10)->get();
+        $mostviewproducts=Product::where('status',1)->select('products.*')->orderBy('view','DESC')->limit(10)->get();
         $home_cats = DB::table('home_cats')->where('status','=',1)->orderBy('home_cats.sort')->get();
         Session::put('title','Home');
 
-        return view('front.home2',compact('page','products','categories','fproducts','setting','aproducts','mostviewproducts','Slider','Rating','meta','onslaeproducts','shap','home_cats'));
+        return view('front.home2',compact('page','products','categories','fproducts','setting','aproducts','mostviewproducts','Slider','Rating','meta','onslaeproducts','shap','home_cats','posts'));
     }
 
    function login()
@@ -704,11 +721,36 @@ class FrontController extends Controller
             'msg_type'=>'success',
         ]);
     }
+    public function wishlist($id)
+    {
+        $cookie_name = "wishlist";
+        $msg = '';
+$list = array();
+if(isset($_COOKIE[$cookie_name])) {
+  $list = json_decode($_COOKIE[$cookie_name], true);
+}
+if (($key = array_search($id, $list)) !== false) {
+    $msg = 'Item remove from wishlist successfully!';
+    unset($list[$key]);
+}
+else
+{
+    $msg = 'Item add to  wishlist successfully!';
+    $list[] = $id;
+}
+$list = json_encode($list);
+setcookie($cookie_name, $list, time() + (86400 * 30), "/");
+return redirect()->back()->with([
+                'msg'=>$msg,
+                'msg_type'=>'success',
+            ]);
+    }
     public function product_detail($slug)
     {
+        
         $allcatagories = Category::where(['status'=>1])->get();
         $Slider=Slider::all();
-        $product = product::where(['slug'=>$slug , 'status'=>1])->get();
+        $product = product::where(['slug'=>$slug ])->get();
         $rate = 0;
         $lrate = array();
         $r_name = '';
@@ -725,6 +767,7 @@ class FrontController extends Controller
             
             $pro = $product[0];
             $cat= Category::where(['id'=>$pro->category_id])->first();
+            $Galleries = Gallerie::where(['product_id'=>$pro->id])->get();
             if($cat)
         {
             $breed[] = array (
@@ -819,7 +862,8 @@ class FrontController extends Controller
             $product_detail = 1;
             $meta_file  = 'meta.product';
             Session::put('title',$product[0]->product_name);
-            return view('front.product_detail',compact('allcatagories','sett','product','rcount','category_id','rproducts','cate','meta','faq','rating','Slider','product_detail','meta_file'));
+            $item  =  $product[0];
+            return view('front.product_detail',compact('allcatagories','sett','product','rcount','category_id','rproducts','cate','meta','faq','rating','Slider','product_detail','meta_file','item'));
             
         }else{
             
@@ -881,6 +925,26 @@ class FrontController extends Controller
             ]);
     }
     
+     public function my_wishlist(Request $request)
+    {
+        Session::put('title','My Wishlist');
+        $page = "shop";
+        $ids = array();
+        if(isset($_COOKIE['wishlist']))
+        {
+            $ids = json_decode($_COOKIE['wishlist']);
+        }
+        if(!$ids)
+        {
+            return redirect()->back()->with([
+                'msg'=>'You did not have anything in wishlist!',
+                'msg_type'=>'danger',
+            ]);
+        }
+        $best =Product::select('products.*')->whereIn('id', $ids)->get();
+        //dd($best);
+        return view('front.my_wishlist',compact('page','best'));
+    }
      public function shop(Request $request)
     {
         Session::put('title','Shop');
@@ -894,6 +958,50 @@ class FrontController extends Controller
         Session::put('title','User Register');
        
         return view('front.register');
+    }
+    
+    public function scategory_detail($slug)
+    {
+        $Slider=Slider::all();
+        $categories=SubCategory::all();
+        $best =Product::where('status',1)->select('products.*')->orderBy('view','DESC')->limit(3)->get();
+
+        $category_id = SubCategory::where(['slug'=>$slug ])->first();
+        $pcategory = Category::where(['id'=>$category_id->category_id ])->first();
+        $cateid = $category_id->id;
+         if(isset($category_id->name))
+        {
+         Session::put('title',$category_id->name);
+        }
+
+        $meta = DB::table('categories_to_meta')
+            ->where('cid', '=', $category_id->id)
+            ->first();
+            if($meta)
+            {
+                $meta->url = url('/category/').'/'.$slug;
+                $setting = DB::table('setting')
+            ->where('id', '=', '1')
+            ->first();
+                $sch = array (
+  '@context' => 'https://schema.org',
+  '@type' => 'Organization',
+  'url' => url('/'),
+  'logo' => asset('').$setting->logo,
+);
+                $meta->scheme = $sch;
+                            }
+                            $category = 1;
+        
+         $products=Product::where(['subcategory_id'=>$cateid , 'status'=>1])->paginate(20);
+         $seo =  CategoriesToMeta::where('cid','=',$cateid)->first();
+       
+       
+        $meta_file  = 'meta.categoy';
+        $sub_cat = 1;
+        return view('front.scategory_detail',compact('meta','products','category_id','best','meta_file','seo','category','sub_cat','pcategory'));
+
+       
     }
     
     public function category_detail($slug)
@@ -926,13 +1034,14 @@ class FrontController extends Controller
 );
                 $meta->scheme = $sch;
                             }
+                            $category = 1;
         
-         $products=Product::where(['category_id'=>$cateid , 'status'=>1])->paginate(20);
+         $products=Product::where('status',1)->where(['category_id'=>$cateid , 'status'=>1])->paginate(20);
          $seo =  CategoriesToMeta::where('cid','=',$cateid)->first();
        
        
         $meta_file  = 'meta.categoy';
-        return view('front.category_detail',compact('meta','products','category_id','best','meta_file','seo'));
+        return view('front.category_detail',compact('meta','products','category_id','best','meta_file','seo','category'));
 
        
     }
@@ -1071,7 +1180,7 @@ class FrontController extends Controller
      public function faq(Request $request)
     {
         
-        $faq=Faq::all();
+        $faq=DB::table('faqs')->get();
         Session::put('title','FAQ');
         return view('front.faq',compact('faq'));
     }
@@ -1083,8 +1192,68 @@ class FrontController extends Controller
     //         return view('front.checkout',compact('setting'));
     // }
 
+    private function send_grid($to,$subj, $html)
+    {
+        $param =array (
+  'personalizations' => 
+  array (
+    0 => 
+    array (
+      'to' => 
+      array (
+        0 => 
+        array (
+          'email' => $to,
+        ),
+      ),
+    ),
+  ),
+  'from' => 
+  array (
+    'email' => 'orders@live-x-martplace.com',
+  ),
+  'subject' => $subj,
+  'content' => 
+  array (
+    0 => 
+    array (
+      'type' => 'text/html',
+      'value' => $html,
+    ),
+  ),
+);
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+  CURLOPT_URL => 'https://api.sendgrid.com/v3/mail/send',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',
+  CURLOPT_POSTFIELDS =>json_encode($param),
+  CURLOPT_HTTPHEADER => array(
+    'Authorization: Bearer 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',
+    'Content-Type: application/json'
+  ),
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+echo $response;
+if($response)
+{
+    die();
+}
+
+
+    }
     public function order_submit(Request $request)
     {
+        
         if(Session::get('user')){
             $Order=new Order();
             foreach(Cart::products() as $product){
@@ -1114,18 +1283,13 @@ class FrontController extends Controller
                     'order' =>$order_data ,
                     
                 ];
-            Mail::send('emails.order', $data, function($message) use ($to_name, $to_email) {
-            $message->to($to_email, $to_name)
-            ->subject('Order Email’');
-            $message->from('info@markethubland.com','markethubland.com');
-            });
-            $to = 'info@markethubland.com	';
-            $to_n = 'Admin';
-            Mail::send('emails.admin_order', $data, function($message) use ($to_n, $to) {
-            $message->to($to, $to_n)
-            ->subject('Order Email’');
-            $message->from('info@markethubland.com','markethubland.com');
-            });
+                $html = view('emails.order', $data)->render();
+                $this->send_grid($to_email,'Order Email', $html);
+                $setting = DB::table('setting')
+    ->where('id', '=', '1')
+    ->first();
+            $to = $setting->email;
+            $this->send_grid($to,'Order Email', $html);
             }
             Session::forget('cart');
             return redirect('/my_account')->with([
@@ -1133,6 +1297,7 @@ class FrontController extends Controller
                 'msg_type'=>'success',
             ]);
         }else{
+            
             $Order=new Order();
             foreach(Cart::products() as $product){
                 
@@ -1165,18 +1330,13 @@ class FrontController extends Controller
                     'order' =>$order_data ,
                     
                 ];
-            Mail::send('emails.order', $data, function($message) use ($to_name, $to_email) {
-            $message->to($to_email, $to_name)
-            ->subject('Order Email’');
-            $message->from('info@markethubland.com','markethubland.com');
-            });
-            $to = 'info@markethubland.com';
-            $to_n = 'Admin';
-            Mail::send('emails.admin_order', $data, function($message) use ($to_n, $to) {
-            $message->to($to, $to_n)
-            ->subject('Order Email’');
-            $message->from('info@markethubland.com','markethubland.com');
-            });
+                $html = view('emails.order', $data)->render();
+                $this->send_grid($to_email,'Order Email', $html);
+                $setting = DB::table('setting')
+    ->where('id', '=', '1')
+    ->first();
+            $to = $setting->email;
+            $this->send_grid($to,'Order Email', $html);
             }
         
             Session::forget('cart');
@@ -2156,9 +2316,9 @@ class FrontController extends Controller
         $Slider=Slider::all();
         $categories=Category::all();
         // return $slug->input();
-        $rproducts = product::where('product_name', 'like', '%'.$slug->text.'%')->get();
+        $rproducts = product::where('status',1)->where('product_name', 'like', '%'.$slug->text.'%')->get();
         // $slug = $rproducts->slug;
-
-        return view('front.result_detail',compact('rproducts','categories'));
+        $search = 1;
+        return view('front.result_detail',compact('rproducts','categories','search'));
     }
 }

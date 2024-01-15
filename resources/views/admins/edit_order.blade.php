@@ -8,6 +8,11 @@ use App\Models\Admins\Gallerie;
 use App\Models\Admins\Product;
 
 ?>
+  <?php $setting = DB::table('setting')
+    ->where('id', '=', '1')
+    ->first();
+$cate = DB::table('categories')->get();
+?>
 <style>
     
     .preview-images-zone {
@@ -196,7 +201,6 @@ use App\Models\Admins\Product;
                           <th scope="col">#</th>
                           <th scope="col">Product Name</th>
                           <th scope="col">Qutantity</th>
-                          <th scope="col">Shipping</th>
                           <th scope="col">Amount</th>
                         </tr>
                         
@@ -205,16 +209,16 @@ use App\Models\Admins\Product;
                       <tbody>
                           <?php $pro = json_decode($edit->product_detail); 
                           $no = 1;
+                          $tot = 0;
                            foreach($pro as $v){
                            
                            $product = Product::where(['id'=>$v->id])->first();
-                           
+                           $tot = $tot + ($v->qty*$product->discount_price);
                            ?>
                         <tr>
                           <th scope="row">{{$no++}}</th>
                           <td>{{$product->product_name}}</td>
                           <td>{{$v->qty}}</td>
-                          <td>{{$product->shipping_price}}</td>
                           <td>Rs:{{$v->qty*$product->discount_price}}</td>
                         </tr>
                         <?php } ?>
@@ -224,9 +228,14 @@ use App\Models\Admins\Product;
                             <tr>
                                 <td></td>
                                 <td></td>
+                                <th scope="row">Shipping charges</th>
+                                <td>Rs:{{$setting->shipping_charges}}</td>
+                            </tr>
+                            <tr>
                                 <td></td>
-                                <th scope="row">Totals</th>
-                                <td>Rs:{{$edit->amount}}</td>
+                                <td></td>
+                                <th scope="row">Shipping charges</th>
+                                <td>Rs:{{$tot + $setting->shipping_charges}}</td>
                             </tr>
                         </tfoot>
                     </table>

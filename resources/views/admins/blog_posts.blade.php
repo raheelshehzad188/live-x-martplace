@@ -29,7 +29,7 @@
                         </div>
                         <div class="form-group"><label class="col-lg-4 control-label">Description</label>
                         <div class="col-lg-8">
-                        <textarea class="summernote" name="description" rows="5">
+                        <textarea class="summernote" name="description" id="description" rows="5">
                             <?php echo isset($edit->description_english) ? htmlspecialchars($edit->description_english) : null; ?>
                         </textarea>
                             <!--<input type="text" required name="description" value="{{isset($edit->description_english) ? $edit->description_english : ""}}"  class="form-control">-->
@@ -105,7 +105,6 @@
             <tr>
                 <th>Sr.No</th>
                 <th>Title</th>
-                <th>Description</th>
                 <th>Creation Ago</th>
                 <th>Action</th>
             </tr>
@@ -116,7 +115,6 @@
                   <tr>
                     <td>{{$sr++}}</td>
                     <td>{{$item->title_english}}</td>
-                    <td>{{$item->description_english}}</td>
                     <td>{{\Carbon\Carbon::parse($item->created_at)->diffForHumans()}}</td>
             
                     <td>

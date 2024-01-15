@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layout.app2')
 
 <?php
 use App\Models\Admins\Category;
@@ -19,13 +19,13 @@ if(isset($item->page_image) && $item->page_image && $item->page_image_status == 
 $img = url('/').'/public/img/slider/'.$item->page_image;
 }
 ?>
-<div class="container-fluid bg-secondary mb-5">
-        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
-            <h1 class="font-weight-semi-bold text-uppercase mb-3"><?php echo $item->name; ?></h1>
-            <div class="d-inline-flex">
-                <p class="m-0"><a href="/">Home</a></p>
-                <p class="m-0 px-2">-</p>
-                <p class="m-0"><?php echo $item->name; ?></p>
+<div class="container-fluid">
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <nav class="breadcrumb bg-light mb-30">
+                    <a class="breadcrumb-item text-dark" href="/">Home</a>
+                    <span class="breadcrumb-item active"><?php echo $item->name; ?></span>
+                </nav>
             </div>
         </div>
     </div>

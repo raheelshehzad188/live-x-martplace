@@ -7,6 +7,17 @@ use App\Models\Admins\Shap;
 use App\Models\Admins\Gallerie;
 
 ?>
+
+@section('title','Product Form')
+
+@section('product_active','active')
+
+@section('product_active_c1','collapse in')
+
+@section('product_child_1_active','active')
+
+
+@section('content')
 <style>
     
     .preview-images-zone {
@@ -90,16 +101,6 @@ use App\Models\Admins\Gallerie;
         width: 301px !important;
     }
 </style>
-@section('title','Product Form')
-
-@section('product_active','active')
-
-@section('product_active_c1','collapse in')
-
-@section('product_child_1_active','active')
-
-
-@section('content')
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-12">
@@ -114,9 +115,10 @@ use App\Models\Admins\Gallerie;
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group"><label class="col-sm-12 control-label">Product Name:</label>
-                                    <div class="col-sm-12"><input type="text" value="<?php echo isset($edit->product_name) ? htmlspecialchars($edit->product_name) : null; ?>" required class="form-control" name="product_name"></div>
+                                    <div class="col-sm-12"><input type="text" value="<?php echo isset($edit->product_name) ? htmlspecialchars($edit->product_name) : null; ?>" onkeyup="create_slug()" required class="form-control" name="product_name" id="product_name"></div>
                                 </div>
                             </div>
+                            
                             <!--<div class="col-sm-4">-->
                             <!--    <div class="form-group"><label class="col-sm-12 control-label">Product Code:</label>-->
                             <!--        <div class="col-sm-12"><input type="text"  class="form-control" name="product_code" value="<?php echo isset($edit->product_code) ? htmlspecialchars($edit->product_code) : null; ?>"></div>-->
@@ -149,7 +151,7 @@ use App\Models\Admins\Gallerie;
                                 ?>
                                 <div class="form-group"><label class="col-sm-12 control-label">Category:</label>
                                     <div class="col-sm-12">
-                                    <select  class="js-example-basic-multiple form-control" name="category_id[]" >
+                                    <select  class="js-example-basic-multiple form-control" name="category_id" >
                                         @foreach($categories as $category)
                                         
                                         <option <?php echo isset($edit->category_id) && in_array($category->id,$cats) ? "selected" : null; ?> value="{{$category->id}}">{{$category->name}}</option>
@@ -159,13 +161,25 @@ use App\Models\Admins\Gallerie;
                                 </div>
                             </div>
                             <div class="col-sm-4">
-                                <div class="form-group"><label class="col-sm-12 control-label">Product Slug:</label>
-                                    <div class="col-sm-12"><input type="text" value="<?php echo isset($edit->slug) ? htmlspecialchars($edit->slug) : null; ?>" required class="form-control" name="slug"></div>
+                                <div class="form-group"><label class="col-sm-12 control-label">Sub Category:</label>
+                                    <div class="col-sm-12">
+                                    <select  class=" form-control" name="subcategory_id" >
+                                        @foreach($scategories as $category)
+                                        
+                                        <option {{ (isset($edit->subcategory_id) && ($edit->subcategory_id == $category->id))?'selected':'' }}  value="{{$category->id}}">{{$category->name}}</option>
+                                        @endforeach
+                                    </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-4">
-                                <div class="form-group"><label class="col-sm-12 control-label">Shipping Price:</label>
-                                    <div class="col-sm-12"><input type="number"  class="form-control" min="1" value="<?php echo isset($edit->shipping_price) ? htmlspecialchars($edit->shipping_price) : null; ?>" name="shipping_price"></div>
+                                <div class="form-group"><label class="col-sm-12 control-label">Product Slug:</label>
+                                    <div class="col-sm-12"><input type="text" value="<?php echo isset($edit->slug) ? htmlspecialchars($edit->slug) : null; ?>" required class="form-control" name="slug" id="slug"></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group"><label class="col-sm-12 control-label">Shipping Percebntge:</label>
+                                    <div class="col-sm-12"><input  readonly="true" id="percent" type="number"  class="form-control" min="1"></div>
                                 </div>
                             </div>
                         </div>
@@ -177,12 +191,24 @@ use App\Models\Admins\Gallerie;
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group"><label class="col-sm-12 control-label">Selling Price:</label>
-                                    <div class="col-sm-12"><input type="number"  class="form-control" min="1" value="<?php echo isset($edit->selling_price) ? htmlspecialchars($edit->selling_price) : null; ?>" name="selling_price"></div>
+                                    <div class="col-sm-12"><input type="number"  class="form-control" onkeyup="calper()" min="1" value="<?php echo isset($edit->selling_price) ? htmlspecialchars($edit->selling_price) : null; ?>" name="selling_price"></div>
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group"><label class="col-sm-12 control-label">Discount Price:</label>
-                                    <div class="col-sm-12"><input type="number"  class="form-control" min="1" value="<?php echo isset($edit->discount_price) ? htmlspecialchars($edit->discount_price) : null; ?>" name="discount_price"></div>
+                                    <div class="col-sm-12"><input type="number"  class="form-control" onkeyup="calper()" min="1" value="<?php echo isset($edit->discount_price) ? htmlspecialchars($edit->discount_price) : null; ?>" name="discount_price"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group"><label class="col-sm-12 control-label">Product Short Discription:</label>
+                                    <div class="col-sm-12">
+                                        <textarea class="summernote" name="short_discriiption" id="short_discriiption" style="height:500px">
+                                            <?php echo isset($edit->short_discriiption) ? htmlspecialchars($edit->short_discriiption) : null; ?>
+        
+                                        </textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -201,18 +227,7 @@ use App\Models\Admins\Gallerie;
                             </div>
                         </div>
                         
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group"><label class="col-sm-12 control-label">Product Short Discription:</label>
-                                    <div class="col-sm-12">
-                                        <textarea class="summernote" name="short_discriiption" id="short_discriiption" style="height:500px">
-                                            <?php echo isset($edit->short_discriiption) ? htmlspecialchars($edit->short_discriiption) : null; ?>
-        
-                                        </textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        
                         <div class="row">
                             <div class="col-sm-4">
                                 <div class="form-group">
@@ -517,4 +532,46 @@ $(document).on("submit","#product_form",function(e){
 </script>
 
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    var slug = function(str) {
+  str = str.replace(/^\s+|\s+$/g, ''); // trim
+  str = str.toLowerCase();
+
+  // remove accents, swap ñ for n, etc
+  var from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
+  var to   = "aaaaaeeeeeiiiiooooouuuunc------";
+  for (var i = 0, l = from.length; i < l; i++) {
+    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+  }
+
+  str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+           .replace(/\s+/g, '-') // collapse whitespace and replace by -
+           .replace(/-+/g, '-'); // collapse dashes
+
+  return str;
+};
+function create_slug(){
+                            var tit = $('#product_name').val();
+                            $('#slug').val(slug(tit));
+                            }
+                            function calper()
+                            {
+                                var saling_price = parseFloat($('input[name ="selling_price"]').val());
+                                var discount_price = parseFloat($('input[name ="discount_price"]').val());
+                                var tot_price = saling_price - discount_price;
+
+var perctg = 0;
+if(saling_price)
+{
+perctg = (tot_price / saling_price) * 100;
+var final_percntage = Math.ceil(perctg);
+$('#percent').val(final_percntage);
+}
+else
+{
+    $('#percent').val(0);
+}
+                                //percent
+                            }
+</script>
 @endpush

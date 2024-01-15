@@ -2,7 +2,7 @@
 
 @section('title','Sub Category')
 
-@section('category_active','active')
+@section('category_child_2_active','active')
 
 @section('category_active_c2','collapse in')
 

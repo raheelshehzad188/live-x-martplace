@@ -2,15 +2,14 @@
 @section('content')
 <?php 
 use App\Models\Admins\Category;
-$cate = Category::limit('6')->get();
 ?>
 <div class="container-fluid">
         <div class="row px-xl-5">
             <div class="col-12">
                 <nav class="breadcrumb bg-light mb-30">
-                    <a class="breadcrumb-item text-dark" href="{{ url('/') }}">Home</a>
-                    <a class="breadcrumb-item text-dark" href="{{ url($category_id->slug) }}">{{$category_id->name}}</a>
-                    <span class="breadcrumb-item active">{{ $category_id->name }}</span>
+                    <a class="breadcrumb-item text-dark" href="#">Home</a>
+                    <a class="breadcrumb-item text-dark" href="#">Wishlist</a></a>
+                    <span class="breadcrumb-item active">My wishlist</span>
                 </nav>
             </div>
         </div>
@@ -48,7 +47,9 @@ $cate = Category::limit('6')->get();
                             </div>
                         </div>
                     </div>
-                     @foreach ($products as  $k=>$v)
+                    @php 
+                  @endphp
+                     @foreach ($best as  $k=>$v)
                     @include('includes/parts/product_box')
                     @endforeach
                 </div>
@@ -56,6 +57,11 @@ $cate = Category::limit('6')->get();
             <!-- Shop Product End -->
         </div>
     </div>
-    
- 
+                
+               
+                 
+                
+             
+                       
+                     
 @endsection
